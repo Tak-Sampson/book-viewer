@@ -18,7 +18,9 @@ helpers do
   end
 
   def highlighted(text, query)
-    text.gsub(query, "<b>#{query}</b>")
+    #text.gsub(query, "<b>#{query}</b>")
+    pattern = Regexp.new(query, Regexp::IGNORECASE)
+    text.gsub(pattern, '<b>\0</b>')
   end
 end
 
@@ -56,9 +58,10 @@ get "/" do
 end
 
 get "/chapter/:number" do
-  num = params[:number]
+  num = params[:number].to_i
+  redirect "/" unless (1..@contents.size).include?(num)
 
-  @title = "Chapter #{num}:  " + @contents[num.to_i - 1]
+  @title = "Chapter #{num}:  " + @contents[num - 1]
   @chapter = File.read("data/chp#{num}.txt")
 
   erb :chapter
